@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <!-- including ECharts file -->
+    <script src="echarts.min.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1200px;height:400px;"></div>
+	<table>
+		<tr>
+			<th>时间</th>
+			<th>温度（℃）</th>
+			<th>湿度（%RH）</th>
+		</tr>
+		<tbody id="data"> <!--data will be displayed here-->
+		
+		</tbody>
+
+	</table>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+		var myChart = echarts.init(document.getElementById('main'));
+		
+		var time = [];
+		var temperature = [];
+		var humidity = [];
+	
+		/*******************************************/
+		// call ajax
+		var ajax = new XMLHttpRequest();
+
+	
+		function initData() {
+		    // send data request
+			ajax.open("GET", './php/data.php', true);
+			ajax.send();
+            // handle received data
+			ajax.onreadystatechange = function()
+			{
+				if (this.readyState == 4 && this.status == 200)
+				{
+					//convertng JSON back to array
+					var data = JSON.parse(this.responseText);
+					for (var i = data.length-1; i >= 0 ; i--){
+						time.push(data[i].time);
+						temperature.push(data[i].temperature);
+						humidity.push(data[i].humidity); 
+					}
+				}
+			}	
+		}
+		
+		function addData(shift) {
+			ajax.open("GET", './php/data.php', true);
+			ajax.send();
+
+			ajax.onreadystatechange = function()
+			{
+				if (this.readyState == 4 && this.status == 200)
+				{
+					//convertng JSON back to array
+					var data = JSON.parse(this.responseText);
+					//Adds new elements to the end of date
+					time.push(data[0].time);
+					temperature.push(data[0].temperature);
+					humidity.push(data[0].humidity); 
+					var html = "";
+					html += "<tr>";
+					     html += "<td>" + data[0].time + "</td>";
+						 html += "<td>" + data[0].temperature + "</td>";
+						 html += "<td>" + data[0].humidity + "</td>";
+					html += "</tr>"
+					 
+                    document.getElementById("data").innerHTML = html;
+				}
+			}
+
+			//Removes the first element of an array
+			if (shift) {
+				time.shift();
+				temperature.shift();
+				humidity.shift();
+			}
+		}
+		
+		initData();
+    
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: 'Sensor network temperature and humidity real-time data'
+            },
+            tooltip: {},
+			xAxis: {
+				type: 'category',
+				boundaryGap: false,
+				data: time
+			},
+			yAxis: [
+			{
+				name:"温度",
+				boundaryGap: [0, '50%'],
+				type: 'value'
+			},
+			{
+				name:"湿度",
+				boundaryGap: [0, '50%'],
+				type: 'value' 
+			}
+			],
+			
+			//标注
+			color:["#c23531","#2f4554"],
+			legend:{
+			data:[{name:"温度"},{name:"湿度"}]
+			},
+			
+			series: [{
+					name: '温度',
+					type:'line',
+					smooth:true,
+					symbol: 'none',
+					stack: 'a',
+					data: temperature
+				}, {
+					name:'湿度',
+					type:'line',
+					smooth:true,
+					symbol: 'none',
+					stack: 'a',
+					yAxisIndex:1,
+					data: humidity
+				}]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+		
+		setInterval(function () {
+			addData(true);
+			myChart.setOption({
+			xAxis: {
+				data:time
+			},
+			series: [{
+				name:'温度',
+				data:temperature
+				
+			},{
+				name:'湿度',
+				data:humidity
+					}]
+			});
+		}, 2000);
+
+    </script>
+</body>
+</html>
