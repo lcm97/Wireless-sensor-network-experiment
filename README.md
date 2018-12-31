@@ -23,3 +23,7 @@ Step7 Front-end scripts read and display databases in real time
 3.Front-end development：Ajax, Echarts
 
 4.Browser：Chrome
+
+## 3.Web page display
+
+![Image text](https://raw.github.com/yourName/repositpry/master/yourprojectName/img-folder/test.jpg)
