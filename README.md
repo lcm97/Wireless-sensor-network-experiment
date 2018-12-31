@@ -26,4 +26,4 @@ Step7 Front-end scripts read and display databases in real time
 
 ## 3.Web page display
 
-![Image text](https://raw.github.com/yourName/repositpry/master/yourprojectName/img-folder/test.jpg)
+![](https://github.com/lcm97/Wireless-sensor-network-experiment/blob/master/WebPage.png)
